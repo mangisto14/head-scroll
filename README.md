@@ -8,6 +8,10 @@
 
 ---
 
+## Demo
+https://mangisto14.github.io/head-scroll/demo/
+---
+
 ## What it does
 
 `head-scroll.js` uses your webcam and **MediaPipe FaceMesh** to track the tilt of your head in real time.  
