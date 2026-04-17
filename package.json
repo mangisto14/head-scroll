@@ -18,12 +18,12 @@
     "webcam",
     "gaze"
   ],
-  "author": "YOUR_NAME",
+  "author": "mangisto14",
   "license": "MIT",
-  "homepage": "https://github.com/YOUR_USERNAME/head-scroll",
+  "homepage": "https://github.com/mangisto14/head-scroll",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/head-scroll.git"
+    "url": "https://github.com/mangisto14/head-scroll.git"
   },
   "files": [
     "head-scroll.js",

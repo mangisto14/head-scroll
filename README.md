@@ -4,7 +4,7 @@
 > One script tag. No dependencies. Works everywhere.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-00f5ff?style=flat-square)](LICENSE)
-[![Demo](https://img.shields.io/badge/demo-live-39ff14?style=flat-square)](https://YOUR_USERNAME.github.io/head-scroll/demo/)
+[![Demo](https://img.shields.io/badge/demo-live-39ff14?style=flat-square)](https://mangisto14.github.io/head-scroll/demo/)
 
 ---
 
@@ -24,7 +24,7 @@ Speed is proportional to tilt angle. A configurable **dead zone** prevents accid
 
 ```html
 <!-- Add before </body> -->
-<script src="https://cdn.jsdelivr.net/gh/YOUR_USERNAME/head-scroll/head-scroll.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mangisto14/head-scroll/head-scroll.js"></script>
 
 <script>
   const hs = new HeadScroll();
@@ -35,7 +35,7 @@ Speed is proportional to tilt angle. A configurable **dead zone** prevents accid
 ### Option 2 — Download
 
 ```bash
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/head-scroll/main/head-scroll.js
+curl -O https://raw.githubusercontent.com/mangisto14/head-scroll/main/head-scroll.js
 ```
 
 Then include locally:
@@ -224,4 +224,4 @@ npx serve .
 
 ## License
 
-MIT © YOUR_NAME
+MIT © mangisto14

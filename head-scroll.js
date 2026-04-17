@@ -1,7 +1,7 @@
 /*!
  * head-scroll.js v1.0.0
  * Scroll any element using head tilt — powered by MediaPipe FaceMesh
- * https://github.com/YOUR_USERNAME/head-scroll
+ * https://github.com/mangisto14/head-scroll
  * MIT License
  */
 
