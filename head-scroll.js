@@ -41,6 +41,12 @@
     /** MediaPipe CDN base URL (override for self-hosting). */
     mediapipeCDN: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/',
 
+    /** Use eye gaze direction (up/down) instead of head tilt. Requires iris landmarks. */
+    eyeGaze: false,
+
+    /** Gaze ratio dead-zone threshold (0–1). Used when eyeGaze is true. */
+    gazeThreshold: 0.08,
+
     /** Called when status changes. Receives (status: string, message: string). */
     onStatus: null,
 
@@ -218,7 +224,7 @@
           });
           this._faceMesh.setOptions({
             maxNumFaces: 1,
-            refineLandmarks: false,
+            refineLandmarks: this.opts.eyeGaze,
             minDetectionConfidence: 0.6,
             minTrackingConfidence: 0.5,
           });
@@ -239,6 +245,25 @@
       });
     }
 
+    _getGazeRatio(lm) {
+      // Requires refineLandmarks: true — iris centers at indices 468 (left) and 473 (right)
+      const leftIris  = lm[468];
+      const rightIris = lm[473];
+      if (!leftIris || !rightIris) return null;
+
+      // Eye vertical bounds: upper eyelid top / lower eyelid bottom
+      // Left eye: top=159, bottom=145  |  Right eye: top=386, bottom=374
+      const leftH  = lm[145].y - lm[159].y;
+      const rightH = lm[374].y - lm[386].y;
+
+      // Skip frame if eyes are nearly closed (blink)
+      if (leftH < 0.008 || rightH < 0.008) return null;
+
+      const leftRatio  = (leftIris.y  - lm[159].y) / leftH;
+      const rightRatio = (rightIris.y - lm[386].y) / rightH;
+      return (leftRatio + rightRatio) / 2;
+    }
+
     _onResults(results) {
       const lm = results.multiFaceLandmarks?.[0];
 
@@ -249,8 +274,15 @@
         return;
       }
 
-      const noseY = lm[4].y;
-      this.lastNoseY = noseY;
+      let trackY;
+      if (this.opts.eyeGaze) {
+        const ratio = this._getGazeRatio(lm);
+        if (ratio === null) return; // blinking — skip frame
+        trackY = ratio;
+      } else {
+        trackY = lm[4].y;
+      }
+      this.lastNoseY = trackY;
 
       // Auto-calibrate once
       if (this.opts.autoCalibrate && !this._autoCalDone && this.neutralY === null) {
@@ -260,7 +292,7 @@
 
       // Sample for calibration
       if (this._calibrating) {
-        this._calFrames.push(noseY);
+        this._calFrames.push(trackY);
         if (this._calFrames.length >= this.opts.calibrationFrames) {
           this._finishCalibration();
         }
@@ -268,8 +300,9 @@
 
       if (this.neutralY === null) return;
 
-      const delta = noseY - this.neutralY;
-      const { threshold, maxSpeed } = this.opts;
+      const delta = trackY - this.neutralY;
+      const threshold = this.opts.eyeGaze ? this.opts.gazeThreshold : this.opts.threshold;
+      const { maxSpeed } = this.opts;
       let scrolling = 'none';
 
       if (delta > threshold) {
@@ -283,17 +316,21 @@
       }
 
       if (this.opts.onFrame) {
-        this.opts.onFrame({ noseY, neutralY: this.neutralY, delta, scrolling });
+        const frameData = this.opts.eyeGaze
+          ? { gazeRatio: trackY, neutralY: this.neutralY, delta, scrolling }
+          : { noseY: trackY,    neutralY: this.neutralY, delta, scrolling };
+        this.opts.onFrame(frameData);
       }
 
-      if (this._hud) this._updateHUDData({ noseY, delta, scrolling });
+      if (this._hud) this._updateHUDData({ delta, scrolling });
     }
 
     _finishCalibration() {
       this.neutralY     = this._calFrames.reduce((a, b) => a + b, 0) / this._calFrames.length;
       this._calibrating = false;
       this._calFrames   = [];
-      this._setStatus('ok', `Calibrated (Y=${this.neutralY.toFixed(3)})`);
+      const label = this.opts.eyeGaze ? 'Gaze' : 'Y';
+      this._setStatus('ok', `Calibrated (${label}=${this.neutralY.toFixed(3)})`);
       this._updateHUDCalState(false);
       if (this.opts.onCalibrated) this.opts.onCalibrated(this.neutralY);
       if (this._calResolve) { this._calResolve(this.neutralY); this._calResolve = null; }
@@ -389,6 +426,10 @@
         </div>
         <div class="hs-body">
           <div class="hs-row">
+            <span class="hs-label">MODE</span>
+            <span class="hs-val" id="hs-mode">—</span>
+          </div>
+          <div class="hs-row">
             <span class="hs-label">DELTA</span>
             <span class="hs-val" id="hs-delta">—</span>
           </div>
@@ -403,6 +444,9 @@
 
       document.body.appendChild(hud);
       this._hud = hud;
+
+      const modeEl = hud.querySelector('#hs-mode');
+      if (modeEl) modeEl.textContent = this.opts.eyeGaze ? 'EYE GAZE' : 'HEAD TILT';
 
       // Close
       hud.querySelector('#hs-close').onclick = () => this.stop();
@@ -420,13 +464,24 @@
       const ctx = canvas.getContext('2d');
       ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
       if (landmarks) {
-        const nose = landmarks[4];
-        const x = nose.x * canvas.width;
-        const y = nose.y * canvas.height;
-        ctx.beginPath();
-        ctx.arc(x, y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(57,255,20,0.9)';
-        ctx.fill();
+        if (this.opts.eyeGaze) {
+          // Draw iris center circles for both eyes
+          [468, 473].forEach(idx => {
+            const pt = landmarks[idx];
+            if (!pt) return;
+            ctx.beginPath();
+            ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 4, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0,245,255,0.9)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          });
+        } else {
+          const nose = landmarks[4];
+          ctx.beginPath();
+          ctx.arc(nose.x * canvas.width, nose.y * canvas.height, 3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(57,255,20,0.9)';
+          ctx.fill();
+        }
       }
     }
 
