@@ -330,7 +330,7 @@ footer a { color:var(--cyan); text-decoration:none; }
 <div class="section" id="demo">
   <div class="section-tag">// TRY IT NOW</div>
   <h2>Live Demo</h2>
-  <p class="lead">Click <strong style="color:#fff">Start</strong>, allow camera access, and tilt your head up/down to scroll the panel on the right.</p>
+  <p class="lead">Click <strong style="color:#fff">Start</strong>, allow camera access, and tilt your head up/down — or switch to <strong style="color:#fff">Eye Gaze</strong> mode to scroll by looking up/down.</p>
 
   <div id="demo-panel">
 
@@ -352,7 +352,7 @@ footer a { color:var(--cyan); text-decoration:none; }
 
       <div id="tilt-section">
         <div class="tilt-label">
-          <span>TILT VECTOR</span>
+          <span id="tilt-label">TILT VECTOR</span>
           <span id="tilt-val" style="color:var(--cyan)">—</span>
         </div>
         <div id="tilt-bar-outer">
@@ -369,6 +369,7 @@ footer a { color:var(--cyan); text-decoration:none; }
 
       <div class="ctrl-row">
         <button class="ctrl-btn primary" id="btn-start">▶ Start</button>
+        <button class="ctrl-btn" id="btn-mode" title="Toggle eye gaze / head tilt mode">☉ Head Tilt</button>
         <button class="ctrl-btn" id="btn-cal" disabled>⚙ Recalibrate</button>
         <button class="ctrl-btn danger" id="btn-stop" disabled>■ Stop</button>
       </div>
@@ -474,6 +475,17 @@ hs.<span class="fn">start</span>();</code></pre>
 });
 hs.<span class="fn">start</span>();</code></pre>
 
+  <p style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;opacity:.6">EYE GAZE MODE</p>
+  <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm">// Scroll by looking up / down instead of tilting your head</span>
+<span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({
+  eyeGaze:       <span class="kw">true</span>,   <span class="cm">// enable iris tracking</span>
+  gazeThreshold: <span class="num">0.08</span>,  <span class="cm">// gaze dead-zone (0–1)</span>
+});
+hs.<span class="fn">start</span>();
+
+<span class="cm">// onFrame receives gazeRatio instead of noseY</span>
+<span class="fn">onFrame</span>: ({ gazeRatio, delta, scrolling }) =&gt; { <span class="cm">/* ... */</span> }</code></pre>
+
   <p style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;opacity:.6">MANUAL CALIBRATION</p>
   <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({ autoCalibrate: <span class="kw">false</span> });
 <span class="kw">await</span> hs.<span class="fn">start</span>();
@@ -500,8 +512,10 @@ document.<span class="fn">getElementById</span>(<span class="str">'cal-btn'</spa
       <tr><td class="on">autoCalibrate</td><td class="ot">boolean</td><td class="od">true</td><td class="oc">Auto-calibrate on first face detection.</td></tr>
       <tr><td class="on">showHUD</td><td class="ot">boolean</td><td class="od">true</td><td class="oc">Show draggable status widget.</td></tr>
       <tr><td class="on">mediapipeCDN</td><td class="ot">string</td><td class="od">jsdelivr</td><td class="oc">Override CDN for self-hosting MediaPipe.</td></tr>
+      <tr><td class="on">eyeGaze</td><td class="ot">boolean</td><td class="od">false</td><td class="oc">Scroll by looking up/down instead of head tilt. Uses iris landmarks — requires <code style="font-family:var(--mono)">refineLandmarks</code>.</td></tr>
+      <tr><td class="on">gazeThreshold</td><td class="ot">number</td><td class="od">0.08</td><td class="oc">Gaze dead-zone (0–1). Used when <code style="font-family:var(--mono)">eyeGaze</code> is true.</td></tr>
       <tr><td class="on">onStatus</td><td class="ot">function</td><td class="od">null</td><td class="oc"><code style="font-family:var(--mono)">(type, msg)</code> — status change callback.</td></tr>
-      <tr><td class="on">onFrame</td><td class="ot">function</td><td class="od">null</td><td class="oc"><code style="font-family:var(--mono)">({ noseY, neutralY, delta, scrolling })</code> — per-frame callback.</td></tr>
+      <tr><td class="on">onFrame</td><td class="ot">function</td><td class="od">null</td><td class="oc"><code style="font-family:var(--mono)">({ noseY|gazeRatio, neutralY, delta, scrolling })</code> — per-frame callback.</td></tr>
       <tr><td class="on">onCalibrated</td><td class="ot">function</td><td class="od">null</td><td class="oc"><code style="font-family:var(--mono)">(neutralY)</code> — fires after calibration.</td></tr>
     </tbody>
   </table>
@@ -537,7 +551,7 @@ document.<span class="fn">getElementById</span>(<span class="str">'cal-btn'</spa
   typeof exports==='object'&&typeof module!=='undefined'?module.exports=factory():typeof define==='function'&&define.amd?define(factory):(global.HeadScroll=factory());
 }(typeof globalThis!=='undefined'?globalThis:typeof window!=='undefined'?window:this,function(){
 'use strict';
-const DEFAULTS={target:null,threshold:0.04,maxSpeed:18,calibrationFrames:90,autoCalibrate:true,showHUD:true,mediapipeCDN:'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/',onStatus:null,onFrame:null,onCalibrated:null};
+const DEFAULTS={target:null,threshold:0.04,maxSpeed:18,calibrationFrames:90,autoCalibrate:true,showHUD:true,mediapipeCDN:'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/',eyeGaze:false,gazeThreshold:0.08,onStatus:null,onFrame:null,onCalibrated:null};
 class HeadScroll{
   constructor(o={}){this.opts=Object.assign({},DEFAULTS,o);this.neutralY=null;this.lastNoseY=0.5;this._running=false;this._calFrames=[];this._calibrating=false;this._autoCalDone=false;this._faceMesh=null;this._camera=null;this._video=null;this._hud=null;}
   async start(){
@@ -575,31 +589,43 @@ class HeadScroll{
       (ready?Promise.resolve():Promise.all([load(cdn+'face_mesh.js'),load(camCDN)]))
       .then(()=>{
         this._faceMesh=new window.FaceMesh({locateFile:f=>cdn+f});
-        this._faceMesh.setOptions({maxNumFaces:1,refineLandmarks:false,minDetectionConfidence:0.6,minTrackingConfidence:0.5});
+        this._faceMesh.setOptions({maxNumFaces:1,refineLandmarks:this.opts.eyeGaze,minDetectionConfidence:0.6,minTrackingConfidence:0.5});
         this._faceMesh.onResults(r=>this._onResults(r));
         this._camera=new window.Camera(this._video,{onFrame:async()=>{if(this._running&&this._faceMesh)await this._faceMesh.send({image:this._video});},width:320,height:240});
         this._camera.start();resolve();
       }).catch(reject);
     });
   }
+  _getGazeRatio(lm){
+    const li=lm[468],ri=lm[473];if(!li||!ri)return null;
+    const lh=lm[145].y-lm[159].y,rh=lm[374].y-lm[386].y;
+    if(lh<0.008||rh<0.008)return null;
+    return((li.y-lm[159].y)/lh+(ri.y-lm[386].y)/rh)/2;
+  }
   _onResults(results){
     const lm=results.multiFaceLandmarks?.[0];
     if(this._hud)this._drawHUDCanvas(results.image,lm);
     if(!lm){this._updateHUDStatus(false);return;}
-    const noseY=lm[4].y;this.lastNoseY=noseY;
+    let trackY;
+    if(this.opts.eyeGaze){const r=this._getGazeRatio(lm);if(r===null)return;trackY=r;}
+    else{trackY=lm[4].y;}
+    this.lastNoseY=trackY;
     if(this.opts.autoCalibrate&&!this._autoCalDone&&this.neutralY===null){this._autoCalDone=true;setTimeout(()=>this.calibrate(),500);}
-    if(this._calibrating){this._calFrames.push(noseY);if(this._calFrames.length>=this.opts.calibrationFrames)this._finishCalibration();}
+    if(this._calibrating){this._calFrames.push(trackY);if(this._calFrames.length>=this.opts.calibrationFrames)this._finishCalibration();}
     if(this.neutralY===null)return;
-    const delta=noseY-this.neutralY;const{threshold,maxSpeed}=this.opts;let scrolling='none';
+    const delta=trackY-this.neutralY;
+    const threshold=this.opts.eyeGaze?this.opts.gazeThreshold:this.opts.threshold;
+    const{maxSpeed}=this.opts;let scrolling='none';
     if(delta>threshold){scrolling='down';const s=Math.min((delta-threshold)/0.06,1)*maxSpeed;this._scroll(s);}
     else if(delta<-threshold){scrolling='up';const s=Math.min((-delta-threshold)/0.06,1)*maxSpeed;this._scroll(-s);}
-    if(this.opts.onFrame)this.opts.onFrame({noseY,neutralY:this.neutralY,delta,scrolling});
-    if(this._hud)this._updateHUDData({noseY,delta,scrolling});
+    const fd=this.opts.eyeGaze?{gazeRatio:trackY,neutralY:this.neutralY,delta,scrolling}:{noseY:trackY,neutralY:this.neutralY,delta,scrolling};
+    if(this.opts.onFrame)this.opts.onFrame(fd);
+    if(this._hud)this._updateHUDData({delta,scrolling});
   }
   _finishCalibration(){
     this.neutralY=this._calFrames.reduce((a,b)=>a+b,0)/this._calFrames.length;
     this._calibrating=false;this._calFrames=[];
-    this._setStatus('ok',`Calibrated (Y=${this.neutralY.toFixed(3)})`);
+    this._setStatus('ok',`Calibrated (${this.opts.eyeGaze?'Gaze':'Y'}=${this.neutralY.toFixed(3)})`);
     this._updateHUDCalState(false);
     if(this.opts.onCalibrated)this.opts.onCalibrated(this.neutralY);
     if(this._calResolve){this._calResolve(this.neutralY);this._calResolve=null;}
@@ -617,7 +643,10 @@ class HeadScroll{
   _drawHUDCanvas(image,lm){
     const c=this._hud?.querySelector('#hs-c2');if(!c)return;
     const ctx=c.getContext('2d');ctx.drawImage(image,0,0,c.width,c.height);
-    if(lm){const n=lm[4];const x=n.x*c.width,y=n.y*c.height;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle='rgba(57,255,20,.9)';ctx.fill();}
+    if(lm){
+      if(this.opts.eyeGaze){[468,473].forEach(i=>{const p=lm[i];if(!p)return;ctx.beginPath();ctx.arc(p.x*c.width,p.y*c.height,4,0,Math.PI*2);ctx.strokeStyle='rgba(0,245,255,.9)';ctx.lineWidth=1.5;ctx.stroke();});}
+      else{const n=lm[4];ctx.beginPath();ctx.arc(n.x*c.width,n.y*c.height,3,0,Math.PI*2);ctx.fillStyle='rgba(57,255,20,.9)';ctx.fill();}
+    }
   }
   _updateHUDStatus(type,msg){
     if(!this._hud)return;
@@ -672,6 +701,7 @@ function copyCode(btn) {
 let hs = null;
 let flashTimer = null;
 let lastDir = 'none';
+let gazeMode = false;
 
 const sdot      = document.getElementById('sdot');
 const smsg      = document.getElementById('smsg');
@@ -723,7 +753,7 @@ function showDirFlash(dir, char) {
   }, 500);
 }
 
-// Draw camera frame + nose dot into the embedded canvas
+// Draw camera frame + landmark dots into the embedded canvas
 function drawFrame(image, lm) {
   if (!image) return;
   camCanvas.width  = camCanvas.offsetWidth  || 240;
@@ -734,26 +764,51 @@ function drawFrame(image, lm) {
   camCtx.restore();
 
   if (lm) {
-    // Mirror X for display
-    const x = (1 - lm[4].x) * camCanvas.width;
-    const y = lm[4].y * camCanvas.height;
-    camCtx.beginPath();
-    camCtx.arc(x, y, 4, 0, Math.PI * 2);
-    camCtx.fillStyle = 'rgba(57,255,20,0.9)';
-    camCtx.fill();
-    camCtx.strokeStyle = 'rgba(255,255,255,0.5)';
-    camCtx.lineWidth = 1;
-    camCtx.stroke();
-    // crosshair
-    camCtx.strokeStyle = 'rgba(57,255,20,0.4)';
-    camCtx.lineWidth = 0.5;
-    camCtx.beginPath(); camCtx.moveTo(x-10,y); camCtx.lineTo(x+10,y); camCtx.stroke();
-    camCtx.beginPath(); camCtx.moveTo(x,y-10); camCtx.lineTo(x,y+10); camCtx.stroke();
+    if (gazeMode) {
+      // Draw iris circles (mirrored X)
+      [468, 473].forEach(idx => {
+        const pt = lm[idx];
+        if (!pt) return;
+        const x = (1 - pt.x) * camCanvas.width;
+        const y = pt.y * camCanvas.height;
+        camCtx.beginPath();
+        camCtx.arc(x, y, 5, 0, Math.PI * 2);
+        camCtx.strokeStyle = 'rgba(0,245,255,0.9)';
+        camCtx.lineWidth = 2;
+        camCtx.stroke();
+      });
+    } else {
+      // Draw nose dot with crosshair (mirrored X)
+      const x = (1 - lm[4].x) * camCanvas.width;
+      const y = lm[4].y * camCanvas.height;
+      camCtx.beginPath();
+      camCtx.arc(x, y, 4, 0, Math.PI * 2);
+      camCtx.fillStyle = 'rgba(57,255,20,0.9)';
+      camCtx.fill();
+      camCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+      camCtx.lineWidth = 1;
+      camCtx.stroke();
+      camCtx.strokeStyle = 'rgba(57,255,20,0.4)';
+      camCtx.lineWidth = 0.5;
+      camCtx.beginPath(); camCtx.moveTo(x-10,y); camCtx.lineTo(x+10,y); camCtx.stroke();
+      camCtx.beginPath(); camCtx.moveTo(x,y-10); camCtx.lineTo(x,y+10); camCtx.stroke();
+    }
   }
 }
 
+document.getElementById('btn-mode').addEventListener('click', () => {
+  if (hs) return; // don't toggle while running
+  gazeMode = !gazeMode;
+  const btn = document.getElementById('btn-mode');
+  btn.textContent = gazeMode ? '👁 Eye Gaze' : '☉ Head Tilt';
+  btn.style.color = gazeMode ? 'var(--cyan)' : '';
+  const tiltLabel = document.getElementById('tilt-label');
+  if (tiltLabel) tiltLabel.textContent = gazeMode ? 'GAZE RATIO' : 'TILT VECTOR';
+});
+
 document.getElementById('btn-start').addEventListener('click', async () => {
   document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-mode').disabled  = true;
 
   // Build a custom HeadScroll that also draws into our embedded canvas
   hs = new HeadScroll({
@@ -762,6 +817,8 @@ document.getElementById('btn-start').addEventListener('click', async () => {
     maxSpeed: 14,
     showHUD: false,  // no floating HUD — we have the integrated one
     autoCalibrate: true,
+    eyeGaze: gazeMode,
+    gazeThreshold: 0.08,
 
     onStatus: (type, msg) => setStatus(type, msg),
 
@@ -771,7 +828,7 @@ document.getElementById('btn-start').addEventListener('click', async () => {
       document.getElementById('btn-stop').disabled = false;
     },
 
-    onFrame: ({ delta, scrolling, noseY }) => {
+    onFrame: ({ delta, scrolling }) => {
       placeholder.style.display = 'none';
       updateTilt(delta);
       updateProgress();
@@ -804,6 +861,7 @@ document.getElementById('btn-cal').addEventListener('click', () => {
 document.getElementById('btn-stop').addEventListener('click', () => {
   if (hs) { hs.stop(); hs = null; }
   document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-mode').disabled  = false;
   document.getElementById('btn-cal').disabled   = true;
   document.getElementById('btn-stop').disabled  = true;
   placeholder.style.display = 'flex';
