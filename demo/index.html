@@ -3,608 +3,822 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>head-scroll.js — Live Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<title>head-scroll.js — Scroll with your head</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
   --cyan: #00f5ff; --green: #39ff14; --red: #ff3355; --amber: #ffaa00;
-  --bg: #040810; --surface: #080f1a; --border: rgba(0,245,255,0.12);
-  --text: #c8d8e8; --dim: #3a5068;
-  --font-mono: 'Share Tech Mono', 'Courier New', monospace;
-  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --bg: #040810; --surface: #080f1a; --surface2: #0d1825;
+  --border: rgba(0,245,255,0.12); --border2: rgba(0,245,255,0.22);
+  --text: #c8d8e8; --dim: #3a5068; --dim2: #5a7890;
+  --mono: 'Share Tech Mono', 'Courier New', monospace;
+  --sans: 'DM Sans', system-ui, sans-serif;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--sans);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* ─── HERO ─────────────────────────── */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 24px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero::before {
+/* ── grid bg ── */
+body::after {
   content: '';
-  position: absolute; inset: 0;
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image:
-    linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(0,245,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.025) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
-.hero-tag {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--cyan);
-  margin-bottom: 20px;
-  opacity: 0.7;
+/* ─── HERO ─────────────────────────────────────── */
+.hero {
+  min-height: 92vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 24px 60px;
+  text-align: center;
+  position: relative; z-index: 1;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 10px; letter-spacing: 3px; color: var(--cyan);
+  opacity: 0.6; margin-bottom: 20px;
 }
 
 h1 {
-  font-size: clamp(42px, 8vw, 88px);
-  font-weight: 600;
-  color: #fff;
-  line-height: 1.05;
-  margin-bottom: 20px;
-  text-shadow: 0 0 60px rgba(0,245,255,0.2);
+  font-size: clamp(48px, 9vw, 96px);
+  font-weight: 600; line-height: 1.0; color: #fff;
+  text-shadow: 0 0 80px rgba(0,245,255,0.15);
+  margin-bottom: 6px;
 }
-
-h1 span { color: var(--cyan); }
+h1 em { color: var(--cyan); font-style: normal; }
 
 .hero-sub {
-  font-size: clamp(14px, 2vw, 18px);
-  color: var(--dim);
-  font-weight: 300;
-  max-width: 480px;
-  margin-bottom: 44px;
-  line-height: 1.7;
+  font-size: clamp(14px,2vw,17px); color: var(--dim2); font-weight: 300;
+  max-width: 440px; line-height: 1.75; margin: 22px auto 44px;
 }
 
-.btn-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
 
 .btn {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 2px;
-  padding: 13px 28px;
-  border-radius: 3px;
-  cursor: pointer;
-  text-transform: uppercase;
-  text-decoration: none;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+  padding: 13px 28px; border-radius: 3px; cursor: pointer;
+  text-transform: uppercase; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 8px;
   transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
 }
-
 .btn-primary {
-  background: var(--cyan);
-  color: #040810;
-  border: none;
-  font-weight: 600;
-  box-shadow: 0 0 24px rgba(0,245,255,0.3);
+  background: var(--cyan); color: #040810; border: none; font-weight: 700;
+  box-shadow: 0 0 28px rgba(0,245,255,0.3);
 }
-.btn-primary:hover { box-shadow: 0 0 40px rgba(0,245,255,0.5); transform: translateY(-1px); }
-
+.btn-primary:hover { box-shadow: 0 0 44px rgba(0,245,255,0.55); transform: translateY(-2px); }
 .btn-outline {
-  background: transparent;
-  color: var(--cyan);
-  border: 1px solid rgba(0,245,255,0.4);
+  background: transparent; color: var(--cyan);
+  border: 1px solid rgba(0,245,255,0.35);
 }
-.btn-outline:hover { background: rgba(0,245,255,0.08); transform: translateY(-1px); }
+.btn-outline:hover { background: rgba(0,245,255,0.07); transform: translateY(-2px); }
 
-/* ─── DEMO SECTION ─────────────────── */
-.section {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 80px 24px;
-}
+/* ─── SECTION WRAPPER ──────────────────────────── */
+.section { max-width: 940px; margin: 0 auto; padding: 72px 24px; position: relative; z-index: 1; }
+.section-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--cyan); opacity: 0.55; margin-bottom: 10px; }
+h2 { font-size: clamp(22px,4vw,32px); color: #fff; font-weight: 600; margin-bottom: 14px; }
+.lead { font-size: 14px; color: var(--dim2); font-weight: 300; line-height: 1.8; max-width: 580px; margin-bottom: 36px; }
 
-.section-tag {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--cyan);
-  letter-spacing: 3px;
-  margin-bottom: 12px;
-  opacity: 0.6;
-}
+hr.divider { border: none; border-top: 1px solid var(--border); }
 
-h2 {
-  font-size: clamp(24px, 4vw, 36px);
-  color: #fff;
-  margin-bottom: 16px;
-  font-weight: 600;
-}
-
-.lead {
-  font-size: 15px;
-  color: var(--dim);
-  font-weight: 300;
-  line-height: 1.8;
-  max-width: 600px;
-  margin-bottom: 40px;
-}
-
-/* ─── INSTALL TABS ──────────────────── */
-.tabs { display: flex; gap: 0; margin-bottom: 0; }
-.tab {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1px;
-  padding: 8px 16px;
-  cursor: pointer;
+/* ─── LIVE DEMO ────────────────────────────────── */
+#demo-panel {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 0;
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  overflow: hidden;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-bottom: none;
-  color: var(--dim);
-  text-transform: uppercase;
-  transition: all 0.15s;
+  min-height: 420px;
+}
+
+/* Left: camera + controls */
+#demo-left {
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  background: rgba(0,0,0,0.3);
+}
+
+.dl-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: 2px; color: var(--cyan); opacity: 0.6;
+}
+
+/* camera feed */
+#cam-box {
+  position: relative; background: #000;
+  aspect-ratio: 4/3; overflow: hidden;
+  flex-shrink: 0;
+}
+#demo-canvas {
+  width: 100%; height: 100%; display: block;
+  transform: scaleX(-1);
+}
+.cam-overlay {
+  position: absolute; inset: 0; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 8px;
+}
+#cam-placeholder {
+  text-align: center;
+  font-family: var(--mono); font-size: 10px;
+  color: rgba(0,245,255,0.4); line-height: 1.8;
+}
+.cam-corner { position: absolute; width: 12px; height: 12px; border-color: var(--cyan); border-style: solid; opacity: 0.5; }
+.cam-corner.tl { top:4px; left:4px;  border-width: 2px 0 0 2px; }
+.cam-corner.tr { top:4px; right:4px; border-width: 2px 2px 0 0; }
+.cam-corner.bl { bottom:4px; left:4px;  border-width: 0 0 2px 2px; }
+.cam-corner.br { bottom:4px; right:4px; border-width: 0 2px 2px 0; }
+
+/* tilt meter */
+#tilt-section {
+  padding: 10px 12px; flex: 1;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.tilt-label {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--dim2); letter-spacing: 1px;
+  display: flex; justify-content: space-between;
+}
+#tilt-bar-outer {
+  height: 56px; background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border); border-radius: 3px;
+  position: relative; overflow: hidden;
+}
+.tz { position: absolute; left:0; right:0; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:8px; letter-spacing:1px; transition: background 0.1s; }
+.tz.up   { top:0; height:33%; color:rgba(0,245,255,0.3); border-bottom:1px dashed rgba(0,245,255,0.15); }
+.tz.mid  { top:33%; height:34%; color:rgba(255,255,255,0.15); }
+.tz.dn   { bottom:0; height:33%; color:rgba(255,51,85,0.3); border-top:1px dashed rgba(255,51,85,0.15); }
+.tz.tz-active-up   { background:rgba(0,245,255,0.1); color:var(--cyan); }
+.tz.tz-active-down { background:rgba(255,51,85,0.1); color:var(--red); }
+#tilt-needle {
+  position: absolute; left:5px; right:5px; height:2px;
+  background: var(--green); box-shadow: 0 0 8px var(--green);
+  top:50%; transform:translateY(-50%);
+  border-radius:2px; transition: top 0.07s;
+}
+
+/* status row */
+.status-row {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 10px; color: var(--dim2);
+}
+.sdot {
+  width:6px; height:6px; border-radius:50%; background:var(--dim); flex-shrink:0;
+  transition: all 0.3s;
+}
+.sdot.ok      { background:var(--green); box-shadow:0 0 7px var(--green); animation:blink 2s infinite; }
+.sdot.loading { background:var(--amber); box-shadow:0 0 7px var(--amber); animation:blink 0.5s infinite; }
+.sdot.error   { background:var(--red);   box-shadow:0 0 7px var(--red); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* control buttons */
+.ctrl-row {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.ctrl-btn {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+  padding: 7px; border-radius: 2px; cursor: pointer;
+  text-transform: uppercase; transition: all 0.2s;
+  border: 1px solid var(--border); background: transparent; color: var(--dim2);
+}
+.ctrl-btn:hover:not(:disabled)  { color:var(--cyan); border-color:rgba(0,245,255,0.3); }
+.ctrl-btn.primary { color:var(--cyan); border-color:rgba(0,245,255,0.4); background:rgba(0,245,255,0.06); }
+.ctrl-btn.primary:hover { background:rgba(0,245,255,0.12); }
+.ctrl-btn.danger  { color:var(--red);  border-color:rgba(255,51,85,0.3); }
+.ctrl-btn.danger:hover  { background:rgba(255,51,85,0.06); }
+.ctrl-btn:disabled { opacity:0.3; cursor:default; }
+
+/* Right: scrollable content */
+#demo-right {
+  display: flex; flex-direction: column;
+}
+.dr-header {
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+  color: var(--cyan); opacity: 0.6;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#scroll-progress {
+  height: 2px; background: rgba(0,245,255,0.08);
+  position: relative; flex-shrink: 0;
+}
+#scroll-fill {
+  position: absolute; inset: 0; right: auto;
+  background: var(--cyan); width: 0%;
+  transition: width 0.1s; box-shadow: 0 0 6px var(--cyan);
+}
+#demo-scroll-area {
+  flex: 1; overflow-y: auto; padding: 20px 24px;
+  font-size: 13px; line-height: 1.85; color: rgba(200,216,232,0.65); font-weight: 300;
+}
+#demo-scroll-area::-webkit-scrollbar { width: 2px; }
+#demo-scroll-area::-webkit-scrollbar-thumb { background: var(--border); }
+#demo-scroll-area p   { margin-bottom: 14px; }
+#demo-scroll-area h3  { color: #fff; font-size: 14px; font-weight: 600; margin: 24px 0 10px; }
+#demo-scroll-area .hl { color: var(--cyan); font-family: var(--mono); font-size: 11px; }
+
+/* scroll dir flash */
+#dir-badge {
+  position: absolute; right: 10px; bottom: 8px;
+  font-size: 18px; pointer-events: none; opacity: 0;
+  transition: opacity 0.12s;
+}
+#dir-badge.show { opacity: 1; }
+#dir-badge.up   { color: var(--cyan); }
+#dir-badge.dn   { color: var(--red); }
+
+/* ─── INSTALL TABS ─────────────────────────────── */
+.tabs { display:flex; }
+.tab {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+  padding: 8px 18px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border); border-bottom: none;
+  color: var(--dim2); text-transform: uppercase; transition: all 0.15s;
+  margin-right: -1px;
 }
 .tab:first-child { border-radius: 4px 0 0 0; }
 .tab:last-child  { border-radius: 0 4px 0 0; }
-.tab.active { background: #0d1825; color: var(--cyan); border-color: rgba(0,245,255,0.3); }
+.tab.active { background: var(--surface2); color: var(--cyan); border-color: var(--border2); z-index: 1; }
 
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
 
-/* ─── CODE BLOCKS ───────────────────── */
+/* ─── CODE ──────────────────────────────────────── */
 pre {
-  background: #0a1220;
-  border: 1px solid var(--border);
-  border-radius: 0 4px 4px 4px;
-  padding: 20px 22px;
-  overflow-x: auto;
-  position: relative;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 0 4px 4px 4px;
+  padding: 18px 20px; overflow-x: auto; position: relative; margin-bottom: 28px;
 }
 code {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.9;
-  color: #a8c4d8;
+  font-family: var(--mono); font-size: 12px; line-height: 2; color: #a8c4d8;
+  white-space: pre;
 }
-.kw  { color: #00f5ff; }  /* cyan — keywords */
-.str { color: #39ff14; }  /* green — strings */
-.cm  { color: #3a5068; }  /* dim — comments */
-.fn  { color: #ffaa00; }  /* amber — function names */
-.num { color: #ff9580; }  /* coral — numbers */
+.kw  { color: #00f5ff; }
+.str { color: #39ff14; }
+.cm  { color: #3a5068; }
+.fn  { color: #ffaa00; }
+.num { color: #ff9580; }
 
 .copy-btn {
-  position: absolute;
-  top: 10px; right: 10px;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 1px;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--dim);
-  padding: 4px 8px;
-  border-radius: 2px;
-  cursor: pointer;
-  text-transform: uppercase;
+  position: absolute; top: 10px; right: 10px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+  background: transparent; border: 1px solid var(--border); color: var(--dim2);
+  padding: 4px 8px; border-radius: 2px; cursor: pointer; text-transform: uppercase;
   transition: all 0.2s;
 }
 .copy-btn:hover { color: var(--cyan); border-color: rgba(0,245,255,0.3); }
 
-/* ─── OPTIONS TABLE ─────────────────── */
-.opt-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-}
+/* ─── OPTIONS TABLE ─────────────────────────────── */
+.opt-table { width:100%; border-collapse:collapse; font-size:12px; }
 .opt-table th {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--cyan);
-  text-align: left;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
-  opacity: 0.7;
+  font-family:var(--mono); font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--cyan); text-align:left; padding:8px 12px; border-bottom:1px solid var(--border); opacity:.6;
 }
-.opt-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(0,245,255,0.05);
-  vertical-align: top;
-  line-height: 1.6;
-}
-.opt-table tr:hover td { background: rgba(0,245,255,0.02); }
-.opt-table .opt-name { font-family: var(--font-mono); color: var(--cyan); white-space: nowrap; }
-.opt-table .opt-type { color: var(--amber); font-family: var(--font-mono); font-size: 10px; }
-.opt-table .opt-default { color: var(--green); font-family: var(--font-mono); font-size: 10px; }
-.opt-table .opt-desc { color: var(--dim); }
+.opt-table td { padding:10px 12px; border-bottom:1px solid rgba(0,245,255,0.04); vertical-align:top; line-height:1.6; }
+.opt-table tr:hover td { background:rgba(0,245,255,0.02); }
+.opt-table .on { font-family:var(--mono); color:var(--cyan); white-space:nowrap; }
+.opt-table .ot { color:var(--amber); font-family:var(--mono); font-size:10px; }
+.opt-table .od { color:var(--green); font-family:var(--mono); font-size:10px; }
+.opt-table .oc { color:var(--dim2); }
 
-/* ─── LIVE DEMO AREA ────────────────── */
-#live-demo {
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-  background: var(--surface);
-}
-
-.demo-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(0,0,0,0.3);
-}
-
-.demo-toolbar-title {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--cyan);
-  letter-spacing: 2px;
-  opacity: 0.7;
-}
-
-#demo-status {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--dim);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-#demo-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--dim); flex-shrink: 0;
-}
-#demo-dot.ok { background: var(--green); box-shadow: 0 0 6px var(--green); }
-#demo-dot.loading { background: var(--amber); animation: blink 0.5s infinite; }
-#demo-dot.error { background: var(--red); }
-@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
-
-.demo-scroll-area {
-  height: 340px;
-  overflow-y: scroll;
-  padding: 20px 24px;
-  scroll-behavior: auto;
-  font-size: 13px;
-  line-height: 1.9;
-  color: rgba(200,216,232,0.65);
-  font-weight: 300;
-}
-.demo-scroll-area::-webkit-scrollbar { width: 2px; }
-.demo-scroll-area::-webkit-scrollbar-thumb { background: var(--border); }
-.demo-scroll-area p { margin-bottom: 16px; }
-.demo-scroll-area h3 { color: #fff; font-size: 15px; margin-bottom: 10px; }
-.demo-scroll-area .hl { color: var(--cyan); font-family: var(--font-mono); font-size: 11px; }
-
-.demo-controls {
-  display: flex;
-  gap: 8px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  background: rgba(0,0,0,0.2);
-}
-
-.demo-btn {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 1px;
-  padding: 7px 14px;
-  border-radius: 2px;
-  cursor: pointer;
-  text-transform: uppercase;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--dim);
-  transition: all 0.2s;
-}
-.demo-btn:hover  { color: var(--cyan); border-color: rgba(0,245,255,0.3); }
-.demo-btn.danger { color: var(--red);  border-color: rgba(255,51,85,0.3); }
-.demo-btn.primary{ color: var(--cyan); border-color: rgba(0,245,255,0.5); background: rgba(0,245,255,0.06); }
-
-/* ─── DIVIDER ───────────────────────── */
-.divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 0;
-}
-
-/* ─── FOOTER ────────────────────────── */
+/* ─── FOOTER ────────────────────────────────────── */
 footer {
-  text-align: center;
-  padding: 40px 24px;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--dim);
-  letter-spacing: 1px;
-  border-top: 1px solid var(--border);
+  text-align:center; padding:40px 24px;
+  font-family:var(--mono); font-size:9px; color:var(--dim); letter-spacing:2px;
+  border-top:1px solid var(--border); position:relative; z-index:1;
 }
-footer a { color: var(--cyan); text-decoration: none; }
+footer a { color:var(--cyan); text-decoration:none; }
+
+@media (max-width: 640px) {
+  #demo-panel { grid-template-columns: 1fr; }
+  #demo-left  { border-right: none; border-bottom: 1px solid var(--border); }
+}
 </style>
 </head>
 <body>
 
-<!-- ─── HERO ─────────────────────────────────────────────────────── -->
+<!-- HERO -->
 <section class="hero">
-  <div class="hero-tag">// HANDS-FREE SCROLLING</div>
-  <h1>head-<span>scroll</span>.js</h1>
-  <p class="hero-sub">
-    Scroll any element using head tilt — powered by MediaPipe FaceMesh.
-    One script tag. Works everywhere.
-  </p>
-  <div class="btn-row">
-    <a href="#install" class="btn btn-primary">▶ Get Started</a>
-    <a href="https://github.com/YOUR_USERNAME/head-scroll" class="btn btn-outline" target="_blank">GitHub ↗</a>
+  <div class="tag">// MEDIAPIPE · HANDS-FREE · VANILLA JS</div>
+  <h1>head-<em>scroll</em>.js</h1>
+  <p class="hero-sub">One script tag. Tilt your head to scroll any element — powered by MediaPipe FaceMesh, fully on-device.</p>
+  <div class="hero-btns">
+    <a href="#demo" class="btn btn-primary">▶ Live Demo</a>
+    <a href="https://github.com/mangisto14/head-scroll" class="btn btn-outline" target="_blank">GitHub ↗</a>
   </div>
 </section>
 
 <hr class="divider">
 
-<!-- ─── LIVE DEMO ─────────────────────────────────────────────────── -->
-<div class="section" id="live-demo-section">
-  <div class="section-tag">// TRY IT LIVE</div>
-  <h2>Interactive Demo</h2>
-  <p class="lead">
-    Allow camera access, wait for auto-calibration, then tilt your head up/down to scroll the box below.
-    The HUD widget appears in the bottom-left corner.
-  </p>
+<!-- LIVE DEMO -->
+<div class="section" id="demo">
+  <div class="section-tag">// TRY IT NOW</div>
+  <h2>Live Demo</h2>
+  <p class="lead">Click <strong style="color:#fff">Start</strong>, allow camera access, and tilt your head up/down to scroll the panel on the right.</p>
 
-  <div id="live-demo">
-    <div class="demo-toolbar">
-      <span class="demo-toolbar-title">DEMO SCROLL TARGET</span>
-      <div id="demo-status">
-        <div id="demo-dot"></div>
-        <span id="demo-msg">Not started</span>
+  <div id="demo-panel">
+
+    <!-- Left col: camera + tilt + controls -->
+    <div id="demo-left">
+      <div class="dl-header">CAM // TILT INPUT</div>
+
+      <div id="cam-box">
+        <canvas id="demo-canvas"></canvas>
+        <div class="cam-corner tl"></div>
+        <div class="cam-corner tr"></div>
+        <div class="cam-corner bl"></div>
+        <div class="cam-corner br"></div>
+        <div class="cam-overlay" id="cam-placeholder-wrap">
+          <div id="cam-placeholder">📷<br>Camera inactive<br><span style="opacity:.5;font-size:9px">Click Start below</span></div>
+        </div>
+        <div id="dir-badge">▲</div>
+      </div>
+
+      <div id="tilt-section">
+        <div class="tilt-label">
+          <span>TILT VECTOR</span>
+          <span id="tilt-val" style="color:var(--cyan)">—</span>
+        </div>
+        <div id="tilt-bar-outer">
+          <div class="tz up"  id="tz-up">SCROLL UP</div>
+          <div class="tz mid">NEUTRAL</div>
+          <div class="tz dn"  id="tz-dn">SCROLL DOWN</div>
+          <div id="tilt-needle"></div>
+        </div>
+        <div class="status-row">
+          <div class="sdot" id="sdot"></div>
+          <span id="smsg" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Not started</span>
+        </div>
+      </div>
+
+      <div class="ctrl-row">
+        <button class="ctrl-btn primary" id="btn-start">▶ Start</button>
+        <button class="ctrl-btn" id="btn-cal" disabled>⚙ Recalibrate</button>
+        <button class="ctrl-btn danger" id="btn-stop" disabled>■ Stop</button>
       </div>
     </div>
 
-    <div class="demo-scroll-area" id="demo-scroll">
-      <h3>What is head-scroll.js?</h3>
-      <p>
-        <span class="hl">head-scroll.js</span> uses your webcam and <span class="hl">MediaPipe FaceMesh</span>
-        to track the position of your nose (landmark #4) in 3D space. When your head tilts up or down
-        beyond the configured threshold, it scrolls any element — or the whole window.
-      </p>
-      <h3>How does calibration work?</h3>
-      <p>
-        During calibration the library samples <span class="hl">90 frames</span> (~3 seconds) and computes
-        the average nose Y position. This becomes your personal neutral baseline. Recalibrate any time you
-        change your sitting position.
-      </p>
-      <h3>Privacy &amp; Security</h3>
-      <p>
-        All video processing happens <span class="hl">on-device</span> in the browser. No frames are sent
-        to any server. The camera stream never leaves your machine.
-      </p>
-      <h3>Use Cases</h3>
-      <p>
-        Hands-free recipe reading in the kitchen. Accessibility for users with motor impairments.
-        Touch-free kiosk interfaces. Scrolling through word-game cards without touching the screen mid-game.
-      </p>
-      <h3>Browser Support</h3>
-      <p>
-        Works in any browser that supports <span class="hl">getUserMedia</span> over a secure context
-        (HTTPS or localhost): Chrome 60+, Edge 79+, Firefox 36+, Safari 11+.
-      </p>
-      <p style="opacity:0.3; font-size:11px; font-family:'Share Tech Mono',monospace; text-align:center; padding: 30px 0;">
-        // END OF SCROLL AREA //
-      </p>
+    <!-- Right col: scrollable content -->
+    <div id="demo-right">
+      <div class="dr-header">
+        <span>SCROLL TARGET</span>
+        <span id="scroll-pct" style="color:var(--green);opacity:1">0%</span>
+      </div>
+      <div id="scroll-progress"><div id="scroll-fill"></div></div>
+      <div id="demo-scroll-area">
+        <h3>What is head-scroll.js?</h3>
+        <p><span class="hl">head-scroll.js</span> uses your webcam and <span class="hl">MediaPipe FaceMesh</span> to track the position of your nose tip (landmark #4) in real time. When your head tilts past the configured threshold, it scrolls any element — or the whole window.</p>
+        <h3>Calibration</h3>
+        <p>Auto-calibration samples <span class="hl">90 frames</span> (~3 seconds) after your face is first detected, computing your personal neutral Y baseline. Recalibrate any time you change your seating position.</p>
+        <h3>Sensitivity</h3>
+        <p>The <span class="hl">threshold</span> option controls the dead zone — how much tilt is needed before scrolling begins. The <span class="hl">maxSpeed</span> option caps the scroll rate. Speed is proportional to tilt angle.</p>
+        <h3>Privacy</h3>
+        <p>All processing happens <span class="hl">on-device</span> in the browser. No video frames leave your machine. MediaPipe runs as a WebAssembly module loaded from CDN.</p>
+        <h3>Use Cases</h3>
+        <p>Hands-free recipe browsing. Accessibility for users with motor impairments. Touch-free kiosk displays. Scrolling through word-game cards mid-round without touching the screen.</p>
+        <h3>Browser Support</h3>
+        <p><span class="hl">Chrome 60+</span> · <span class="hl">Edge 79+</span> · <span class="hl">Firefox 36+</span> · <span class="hl">Safari 11+</span></p>
+        <p style="font-family:var(--mono);font-size:9px;color:var(--dim);text-align:center;padding:30px 0 10px;letter-spacing:2px">// END OF SCROLL AREA //</p>
+      </div>
     </div>
 
-    <div class="demo-controls">
-      <button class="demo-btn primary" id="btn-start">▶ Start</button>
-      <button class="demo-btn" id="btn-cal" disabled>⚙ Recalibrate</button>
-      <button class="demo-btn danger" id="btn-stop" disabled>■ Stop</button>
-    </div>
   </div>
 </div>
 
 <hr class="divider">
 
-<!-- ─── INSTALL ───────────────────────────────────────────────────── -->
+<!-- INSTALL -->
 <div class="section" id="install">
   <div class="section-tag">// INSTALLATION</div>
   <h2>Get Started</h2>
-  <p class="lead">Three ways to add head-scroll.js to your project.</p>
+  <p class="lead">Three ways to add head-scroll.js to your project. Must be served over <code style="font-family:var(--mono);color:var(--cyan)">https://</code> or <code style="font-family:var(--mono);color:var(--cyan)">localhost</code> for camera access.</p>
 
   <div class="tabs">
     <div class="tab active" data-tab="cdn">CDN</div>
-    <div class="tab" data-tab="download">Download</div>
+    <div class="tab" data-tab="dl">Download</div>
     <div class="tab" data-tab="npm">npm</div>
   </div>
 
-  <div class="tab-content active" data-tab="cdn">
-    <pre><button class="copy-btn" onclick="copy(this)">COPY</button><code><span class="cm">&lt;!-- Add before &lt;/body&gt; --&gt;</span>
-<span class="kw">&lt;script</span> src=<span class="str">"https://cdn.jsdelivr.net/gh/YOUR_USERNAME/head-scroll/head-scroll.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
-
-<span class="cm">&lt;!-- Then use it --&gt;</span>
+  <div class="tab-pane active" data-tab="cdn">
+    <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm">&lt;!-- Paste before &lt;/body&gt; --&gt;</span>
+<span class="kw">&lt;script</span> src=<span class="str">"https://cdn.jsdelivr.net/gh/mangisto14/head-scroll/head-scroll.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
 <span class="kw">&lt;script&gt;</span>
-  <span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>();
-  hs.<span class="fn">start</span>();
+  <span class="kw">new</span> <span class="fn">HeadScroll</span>().<span class="fn">start</span>();
 <span class="kw">&lt;/script&gt;</span></code></pre>
   </div>
 
-  <div class="tab-content" data-tab="download">
-    <pre><button class="copy-btn" onclick="copy(this)">COPY</button><code><span class="cm"># Download the file</span>
-curl -O https://raw.githubusercontent.com/YOUR_USERNAME/head-scroll/main/head-scroll.js
+  <div class="tab-pane" data-tab="dl">
+    <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="cm"># Download</span>
+curl -O https://raw.githubusercontent.com/mangisto14/head-scroll/main/head-scroll.js
 
-<span class="cm"># Then include locally</span>
-<span class="kw">&lt;script</span> src=<span class="str">"./head-scroll.js"</span><span class="kw">&gt;&lt;/script&gt;</span></code></pre>
+<span class="cm">&lt;!-- Use locally --&gt;</span>
+<span class="kw">&lt;script</span> src=<span class="str">"./head-scroll.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
+<span class="kw">&lt;script&gt;</span>
+  <span class="kw">new</span> <span class="fn">HeadScroll</span>().<span class="fn">start</span>();
+<span class="kw">&lt;/script&gt;</span></code></pre>
   </div>
 
-  <div class="tab-content" data-tab="npm">
-    <pre><button class="copy-btn" onclick="copy(this)">COPY</button><code>npm install head-scroll
+  <div class="tab-pane" data-tab="npm">
+    <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code>npm install head-scroll
 
-<span class="cm">// ESM import</span>
 <span class="kw">import</span> HeadScroll <span class="kw">from</span> <span class="str">'head-scroll'</span>;
-
-<span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>();
-hs.<span class="fn">start</span>();</code></pre>
+<span class="kw">new</span> <span class="fn">HeadScroll</span>().<span class="fn">start</span>();</code></pre>
   </div>
 </div>
 
 <hr class="divider">
 
-<!-- ─── USAGE ─────────────────────────────────────────────────────── -->
+<!-- USAGE -->
 <div class="section">
   <div class="section-tag">// USAGE EXAMPLES</div>
   <h2>Examples</h2>
-  <p class="lead">From zero to advanced in four snippets.</p>
 
-  <p style="font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--cyan); letter-spacing:2px; margin-bottom:8px; opacity:0.7;">MINIMAL — SCROLL WINDOW</p>
-  <pre style="margin-bottom:28px;"><button class="copy-btn" onclick="copy(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>();
-hs.<span class="fn">start</span>(); <span class="cm">// asks for camera, auto-calibrates, starts scrolling window</span></code></pre>
+  <p style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;opacity:.6">MINIMAL</p>
+  <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>();
+hs.<span class="fn">start</span>(); <span class="cm">// camera → auto-calibrate → scroll window</span></code></pre>
 
-  <p style="font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--cyan); letter-spacing:2px; margin-bottom:8px; opacity:0.7;">SCROLL A SPECIFIC ELEMENT</p>
-  <pre style="margin-bottom:28px;"><button class="copy-btn" onclick="copy(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({
+  <p style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;opacity:.6">SCROLL A SPECIFIC ELEMENT</p>
+  <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({
   target:    document.<span class="fn">getElementById</span>(<span class="str">'my-card'</span>),
-  threshold: <span class="num">0.03</span>,   <span class="cm">// more sensitive</span>
-  maxSpeed:  <span class="num">12</span>,     <span class="cm">// slower scroll</span>
+  threshold: <span class="num">0.03</span>,  <span class="cm">// more sensitive</span>
+  maxSpeed:  <span class="num">12</span>,    <span class="cm">// slower</span>
 });
 hs.<span class="fn">start</span>();</code></pre>
 
-  <p style="font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--cyan); letter-spacing:2px; margin-bottom:8px; opacity:0.7;">CALLBACKS — REACT / GAME INTEGRATION</p>
-  <pre style="margin-bottom:28px;"><button class="copy-btn" onclick="copy(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({
+  <p style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;opacity:.6">CALLBACKS — GAME / REACT INTEGRATION</p>
+  <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({
   showHUD: <span class="kw">false</span>,
-  <span class="fn">onCalibrated</span>: (neutralY) =&gt; {
-    console.<span class="fn">log</span>(<span class="str">'Ready! Neutral Y:'</span>, neutralY);
-  },
-  <span class="fn">onFrame</span>: ({ delta, scrolling }) =&gt; {
+  <span class="fn">onCalibrated</span>: (neutralY) =&gt; console.<span class="fn">log</span>(<span class="str">'Ready! Y='</span>, neutralY),
+  <span class="fn">onFrame</span>: ({ scrolling }) =&gt; {
     <span class="cm">// scrolling === 'up' | 'down' | 'none'</span>
-    <span class="kw">if</span> (scrolling === <span class="str">'down'</span>) nextCard();
-    <span class="kw">if</span> (scrolling === <span class="str">'up'</span>)   prevCard();
+    <span class="kw">if</span> (scrolling === <span class="str">'down'</span>) <span class="fn">nextCard</span>();
+    <span class="kw">if</span> (scrolling === <span class="str">'up'</span>)   <span class="fn">prevCard</span>();
   },
-  <span class="fn">onStatus</span>: (type, msg) =&gt; updateUI(type, msg),
+  <span class="fn">onStatus</span>: (type, msg) =&gt; <span class="fn">updateUI</span>(type, msg),
 });
 hs.<span class="fn">start</span>();</code></pre>
 
-  <p style="font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--cyan); letter-spacing:2px; margin-bottom:8px; opacity:0.7;">MANUAL CALIBRATION TRIGGER</p>
-  <pre><button class="copy-btn" onclick="copy(this)">COPY</button><code><span class="cm">// Disable auto-calibrate, trigger manually</span>
-<span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({ autoCalibrate: <span class="kw">false</span> });
+  <p style="font-family:var(--mono);font-size:9px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;opacity:.6">MANUAL CALIBRATION</p>
+  <pre><button class="copy-btn" onclick="copyCode(this)">COPY</button><code><span class="kw">const</span> hs = <span class="kw">new</span> <span class="fn">HeadScroll</span>({ autoCalibrate: <span class="kw">false</span> });
 <span class="kw">await</span> hs.<span class="fn">start</span>();
 
 document.<span class="fn">getElementById</span>(<span class="str">'cal-btn'</span>).<span class="fn">addEventListener</span>(<span class="str">'click'</span>, <span class="kw">async</span> () =&gt; {
   <span class="kw">const</span> y = <span class="kw">await</span> hs.<span class="fn">calibrate</span>();
-  console.<span class="fn">log</span>(<span class="str">'Neutral Y set to'</span>, y);
+  console.<span class="fn">log</span>(<span class="str">'Neutral Y:'</span>, y);
 });</code></pre>
 </div>
 
 <hr class="divider">
 
-<!-- ─── OPTIONS ───────────────────────────────────────────────────── -->
+<!-- API REFERENCE -->
 <div class="section">
   <div class="section-tag">// API REFERENCE</div>
   <h2>Options</h2>
-  <p class="lead">Pass an options object to the constructor.</p>
-
-  <table class="opt-table">
-    <thead>
-      <tr>
-        <th>Option</th><th>Type</th><th>Default</th><th>Description</th>
-      </tr>
-    </thead>
+  <table class="opt-table" style="margin-bottom:40px">
+    <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td class="opt-name">target</td><td class="opt-type">Element</td><td class="opt-default">null</td><td class="opt-desc">Element to scroll. <code>null</code> = window.</td></tr>
-      <tr><td class="opt-name">threshold</td><td class="opt-type">number</td><td class="opt-default">0.04</td><td class="opt-desc">Dead-zone size (0–1). Smaller = more sensitive.</td></tr>
-      <tr><td class="opt-name">maxSpeed</td><td class="opt-type">number</td><td class="opt-default">18</td><td class="opt-desc">Maximum scroll speed in px/frame.</td></tr>
-      <tr><td class="opt-name">calibrationFrames</td><td class="opt-type">number</td><td class="opt-default">90</td><td class="opt-desc">Frames to sample during calibration (~3 sec at 30fps).</td></tr>
-      <tr><td class="opt-name">autoCalibrate</td><td class="opt-type">boolean</td><td class="opt-default">true</td><td class="opt-desc">Calibrate automatically on first face detection.</td></tr>
-      <tr><td class="opt-name">showHUD</td><td class="opt-type">boolean</td><td class="opt-default">true</td><td class="opt-desc">Show draggable status widget.</td></tr>
-      <tr><td class="opt-name">mediapipeCDN</td><td class="opt-type">string</td><td class="opt-default">"jsdelivr…"</td><td class="opt-desc">Override CDN for self-hosting MediaPipe.</td></tr>
-      <tr><td class="opt-name">onStatus</td><td class="opt-type">function</td><td class="opt-default">null</td><td class="opt-desc">Called on status change: <code>(type, message)</code>.</td></tr>
-      <tr><td class="opt-name">onFrame</td><td class="opt-type">function</td><td class="opt-default">null</td><td class="opt-desc">Called every frame: <code>({ noseY, neutralY, delta, scrolling })</code>.</td></tr>
-      <tr><td class="opt-name">onCalibrated</td><td class="opt-type">function</td><td class="opt-default">null</td><td class="opt-desc">Called after calibration: <code>(neutralY)</code>.</td></tr>
+      <tr><td class="on">target</td><td class="ot">Element</td><td class="od">null</td><td class="oc">Element to scroll. <code style="font-family:var(--mono)">null</code> = window.</td></tr>
+      <tr><td class="on">threshold</td><td class="ot">number</td><td class="od">0.04</td><td class="oc">Dead-zone (0–1). Smaller = more sensitive.</td></tr>
+      <tr><td class="on">maxSpeed</td><td class="ot">number</td><td class="od">18</td><td class="oc">Max scroll speed in px/frame.</td></tr>
+      <tr><td class="on">calibrationFrames</td><td class="ot">number</td><td class="od">90</td><td class="oc">Frames sampled during calibration (~3s at 30fps).</td></tr>
+      <tr><td class="on">autoCalibrate</td><td class="ot">boolean</td><td class="od">true</td><td class="oc">Auto-calibrate on first face detection.</td></tr>
+      <tr><td class="on">showHUD</td><td class="ot">boolean</td><td class="od">true</td><td class="oc">Show draggable status widget.</td></tr>
+      <tr><td class="on">mediapipeCDN</td><td class="ot">string</td><td class="od">jsdelivr</td><td class="oc">Override CDN for self-hosting MediaPipe.</td></tr>
+      <tr><td class="on">onStatus</td><td class="ot">function</td><td class="od">null</td><td class="oc"><code style="font-family:var(--mono)">(type, msg)</code> — status change callback.</td></tr>
+      <tr><td class="on">onFrame</td><td class="ot">function</td><td class="od">null</td><td class="oc"><code style="font-family:var(--mono)">({ noseY, neutralY, delta, scrolling })</code> — per-frame callback.</td></tr>
+      <tr><td class="on">onCalibrated</td><td class="ot">function</td><td class="od">null</td><td class="oc"><code style="font-family:var(--mono)">(neutralY)</code> — fires after calibration.</td></tr>
     </tbody>
   </table>
 
-  <p style="font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--cyan); letter-spacing:2px; margin: 36px 0 8px; opacity:0.7;">METHODS</p>
+  <h2 style="margin-bottom:14px">Methods</h2>
   <table class="opt-table">
     <thead><tr><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td class="opt-name">start()</td><td class="opt-type">Promise&lt;void&gt;</td><td class="opt-desc">Start camera + tracking.</td></tr>
-      <tr><td class="opt-name">stop()</td><td class="opt-type">void</td><td class="opt-desc">Stop tracking and release camera.</td></tr>
-      <tr><td class="opt-name">calibrate()</td><td class="opt-type">Promise&lt;number&gt;</td><td class="opt-desc">Trigger calibration. Resolves with neutralY.</td></tr>
-      <tr><td class="opt-name">setNeutralY(y)</td><td class="opt-type">void</td><td class="opt-desc">Manually set neutral position.</td></tr>
+      <tr><td class="on">start()</td><td class="ot">Promise&lt;void&gt;</td><td class="oc">Request camera, load model, begin tracking.</td></tr>
+      <tr><td class="on">stop()</td><td class="ot">void</td><td class="oc">Stop tracking, release camera, remove HUD.</td></tr>
+      <tr><td class="on">calibrate()</td><td class="ot">Promise&lt;number&gt;</td><td class="oc">Trigger calibration. Resolves with neutralY.</td></tr>
+      <tr><td class="on">setNeutralY(y)</td><td class="ot">void</td><td class="oc">Manually override neutral position.</td></tr>
     </tbody>
   </table>
 </div>
 
 <hr class="divider">
-
 <footer>
-  head-scroll.js — MIT License —
-  <a href="https://github.com/YOUR_USERNAME/head-scroll" target="_blank">GitHub ↗</a>
+  head-scroll.js v1.0.0 — MIT License —
+  <a href="https://github.com/mangisto14/head-scroll" target="_blank">github.com/mangisto14/head-scroll ↗</a>
 </footer>
 
-<!-- ─── SCRIPTS ───────────────────────────────────────────────────── -->
-<script src="../head-scroll.js"></script>
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  EMBEDDED LIBRARY (no external script dependency)             -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
 <script>
-  // ── Tabs ──
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.onclick = () => {
-      const key = tab.dataset.tab;
-      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === key));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.dataset.tab === key));
-    };
-  });
-
-  // ── Copy ──
-  function copy(btn) {
-    const code = btn.nextElementSibling.textContent;
-    navigator.clipboard.writeText(code).then(() => {
-      btn.textContent = 'COPIED!';
-      setTimeout(() => btn.textContent = 'COPY', 1500);
+/*!
+ * head-scroll.js v1.0.0 — embedded
+ * https://github.com/mangisto14/head-scroll
+ * MIT License
+ */
+(function(global,factory){
+  typeof exports==='object'&&typeof module!=='undefined'?module.exports=factory():typeof define==='function'&&define.amd?define(factory):(global.HeadScroll=factory());
+}(typeof globalThis!=='undefined'?globalThis:typeof window!=='undefined'?window:this,function(){
+'use strict';
+const DEFAULTS={target:null,threshold:0.04,maxSpeed:18,calibrationFrames:90,autoCalibrate:true,showHUD:true,mediapipeCDN:'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/',onStatus:null,onFrame:null,onCalibrated:null};
+class HeadScroll{
+  constructor(o={}){this.opts=Object.assign({},DEFAULTS,o);this.neutralY=null;this.lastNoseY=0.5;this._running=false;this._calFrames=[];this._calibrating=false;this._autoCalDone=false;this._faceMesh=null;this._camera=null;this._video=null;this._hud=null;}
+  async start(){
+    if(this._running)return;this._running=true;this._setStatus('loading','Requesting camera…');
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:320,height:240}});
+      this._video=document.createElement('video');this._video.srcObject=stream;this._video.autoplay=true;this._video.playsInline=true;this._video.muted=true;this._video.style.display='none';document.body.appendChild(this._video);
+      if(this.opts.showHUD)this._buildHUD();
+      this._setStatus('loading','Loading MediaPipe…');
+      await this._loadMediaPipe();
+      this._setStatus('ok','Tracking active');
+    }catch(err){this._running=false;this._setStatus('error',err.message);throw err;}
+  }
+  stop(){
+    this._running=false;
+    if(this._camera){try{this._camera.stop();}catch(e){}}
+    if(this._video){this._video.srcObject?.getTracks().forEach(t=>t.stop());this._video.remove();}
+    if(this._hud)this._hud.remove();
+    this._faceMesh=null;this._camera=null;this._video=null;this._hud=null;
+  }
+  calibrate(){
+    return new Promise(resolve=>{
+      this._calFrames=[];this._calibrating=true;this._calResolve=resolve;
+      this._setStatus('loading','Calibrating…');this._updateHUDCalState(true);
     });
   }
-
-  // ── Live Demo ──
-  let hs = null;
-  const dot  = document.getElementById('demo-dot');
-  const msg  = document.getElementById('demo-msg');
-  const scrollTarget = document.getElementById('demo-scroll');
-
-  document.getElementById('btn-start').onclick = async () => {
-    document.getElementById('btn-start').disabled = true;
-    hs = new HeadScroll({
-      target: scrollTarget,
-      threshold: 0.04,
-      maxSpeed: 14,
-      showHUD: true,
-      onStatus: (type, m) => {
-        dot.className = type;
-        msg.textContent = m;
-      },
+  setNeutralY(y){this.neutralY=y;}
+  get isRunning(){return this._running;}
+  get neutral(){return this.neutralY;}
+  _loadMediaPipe(){
+    return new Promise((resolve,reject)=>{
+      const load=src=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.crossOrigin='anonymous';s.onload=res;s.onerror=()=>rej(new Error('Failed: '+src));document.head.appendChild(s);});
+      const cdn=this.opts.mediapipeCDN;const camCDN='https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js';
+      const ready=typeof window.FaceMesh!=='undefined';
+      (ready?Promise.resolve():Promise.all([load(cdn+'face_mesh.js'),load(camCDN)]))
+      .then(()=>{
+        this._faceMesh=new window.FaceMesh({locateFile:f=>cdn+f});
+        this._faceMesh.setOptions({maxNumFaces:1,refineLandmarks:false,minDetectionConfidence:0.6,minTrackingConfidence:0.5});
+        this._faceMesh.onResults(r=>this._onResults(r));
+        this._camera=new window.Camera(this._video,{onFrame:async()=>{if(this._running&&this._faceMesh)await this._faceMesh.send({image:this._video});},width:320,height:240});
+        this._camera.start();resolve();
+      }).catch(reject);
     });
-    try {
-      await hs.start();
+  }
+  _onResults(results){
+    const lm=results.multiFaceLandmarks?.[0];
+    if(this._hud)this._drawHUDCanvas(results.image,lm);
+    if(!lm){this._updateHUDStatus(false);return;}
+    const noseY=lm[4].y;this.lastNoseY=noseY;
+    if(this.opts.autoCalibrate&&!this._autoCalDone&&this.neutralY===null){this._autoCalDone=true;setTimeout(()=>this.calibrate(),500);}
+    if(this._calibrating){this._calFrames.push(noseY);if(this._calFrames.length>=this.opts.calibrationFrames)this._finishCalibration();}
+    if(this.neutralY===null)return;
+    const delta=noseY-this.neutralY;const{threshold,maxSpeed}=this.opts;let scrolling='none';
+    if(delta>threshold){scrolling='down';const s=Math.min((delta-threshold)/0.06,1)*maxSpeed;this._scroll(s);}
+    else if(delta<-threshold){scrolling='up';const s=Math.min((-delta-threshold)/0.06,1)*maxSpeed;this._scroll(-s);}
+    if(this.opts.onFrame)this.opts.onFrame({noseY,neutralY:this.neutralY,delta,scrolling});
+    if(this._hud)this._updateHUDData({noseY,delta,scrolling});
+  }
+  _finishCalibration(){
+    this.neutralY=this._calFrames.reduce((a,b)=>a+b,0)/this._calFrames.length;
+    this._calibrating=false;this._calFrames=[];
+    this._setStatus('ok',`Calibrated (Y=${this.neutralY.toFixed(3)})`);
+    this._updateHUDCalState(false);
+    if(this.opts.onCalibrated)this.opts.onCalibrated(this.neutralY);
+    if(this._calResolve){this._calResolve(this.neutralY);this._calResolve=null;}
+  }
+  _scroll(px){const t=this.opts.target;t?t.scrollTop+=px:window.scrollBy(0,px);}
+  _setStatus(type,msg){if(this.opts.onStatus)this.opts.onStatus(type,msg);if(this._hud)this._updateHUDStatus(type,msg);}
+  _buildHUD(){
+    const hud=document.createElement('div');hud.id='__head-scroll-hud__';
+    hud.innerHTML=`<style>#__head-scroll-hud__{position:fixed;bottom:20px;left:20px;z-index:99999;width:190px;background:rgba(4,8,16,.93);border:1px solid rgba(0,245,255,.25);border-radius:6px;font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;color:#c8d8e8;backdrop-filter:blur(8px);box-shadow:0 4px 24px rgba(0,0,0,.5);overflow:hidden;user-select:none}#__head-scroll-hud__ .hh{padding:7px 10px;border-bottom:1px solid rgba(0,245,255,.15);display:flex;align-items:center;gap:6px;cursor:move}#__head-scroll-hud__ .hd{width:6px;height:6px;border-radius:50%;background:#3a5068;flex-shrink:0;transition:all .3s}#__head-scroll-hud__ .hd.ok{background:#39ff14;box-shadow:0 0 6px #39ff14;animation:hb 2s infinite}#__head-scroll-hud__ .hd.loading{background:#ffaa00;box-shadow:0 0 6px #ffaa00;animation:hb .5s infinite}#__head-scroll-hud__ .hd.error{background:#ff3355;box-shadow:0 0 6px #ff3355}@keyframes hb{0%,100%{opacity:1}50%{opacity:.3}}#__head-scroll-hud__ .hm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.7}#__head-scroll-hud__ .hx{opacity:.4;cursor:pointer;font-size:12px}#__head-scroll-hud__ .hx:hover{opacity:1}#__head-scroll-hud__ .hcw{background:#000}#__head-scroll-hud__ canvas{width:100%;display:block;transform:scaleX(-1)}#__head-scroll-hud__ .hb2{padding:8px 10px;display:flex;flex-direction:column;gap:6px}#__head-scroll-hud__ .hr{display:flex;justify-content:space-between}#__head-scroll-hud__ .hl2{color:rgba(0,245,255,.5)}#__head-scroll-hud__ .hv{color:#00f5ff}#__head-scroll-hud__ .hbo{height:6px;background:rgba(0,0,0,.5);border:1px solid rgba(0,245,255,.15);border-radius:3px;overflow:hidden;position:relative}#__head-scroll-hud__ .hbi{height:100%;width:50%;position:absolute;left:0;background:rgba(0,245,255,.3);transition:width .08s,background .1s}#__head-scroll-hud__ .hbc{position:absolute;left:50%;top:-1px;bottom:-1px;width:1px;background:rgba(255,255,255,.2)}#__head-scroll-hud__ .hsb{width:100%;background:transparent;border:1px solid rgba(0,245,255,.4);color:#00f5ff;font-family:inherit;font-size:9px;letter-spacing:1px;padding:5px;cursor:pointer;text-transform:uppercase;border-radius:2px;transition:all .2s}#__head-scroll-hud__ .hsb:hover{background:rgba(0,245,255,.08)}#__head-scroll-hud__ .hsi{text-align:center;font-size:14px;height:18px;line-height:18px;color:rgba(0,245,255,.2);transition:all .1s}#__head-scroll-hud__ .hsi.up{color:#00f5ff;text-shadow:0 0 8px #00f5ff}#__head-scroll-hud__ .hsi.down{color:#ff3355;text-shadow:0 0 8px #ff3355}</style><div class="hh"><div class="hd loading" id="hs-dot2"></div><div class="hm" id="hs-msg2">Initializing…</div><div class="hx" id="hs-x">✕</div></div><div class="hcw"><canvas id="hs-c2" width="190" height="142"></canvas></div><div class="hb2"><div class="hr"><span class="hl2">DELTA</span><span class="hv" id="hs-d2">—</span></div><div class="hbo"><div class="hbi" id="hs-b2"></div><div class="hbc"></div></div><div class="hsi" id="hs-si">●</div><button class="hsb" id="hs-cb2">⚙ Calibrate</button></div>`;
+    document.body.appendChild(hud);this._hud=hud;
+    hud.querySelector('#hs-x').onclick=()=>this.stop();
+    hud.querySelector('#hs-cb2').onclick=()=>this.calibrate();
+    this._makeDraggable(hud,hud.querySelector('.hh'));
+  }
+  _drawHUDCanvas(image,lm){
+    const c=this._hud?.querySelector('#hs-c2');if(!c)return;
+    const ctx=c.getContext('2d');ctx.drawImage(image,0,0,c.width,c.height);
+    if(lm){const n=lm[4];const x=n.x*c.width,y=n.y*c.height;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle='rgba(57,255,20,.9)';ctx.fill();}
+  }
+  _updateHUDStatus(type,msg){
+    if(!this._hud)return;
+    const d=this._hud.querySelector('#hs-dot2'),m=this._hud.querySelector('#hs-msg2');
+    if(d)d.className='hd '+(type===true?'ok':type===false?'error':type);
+    if(m&&msg)m.textContent=msg;
+  }
+  _updateHUDData({delta,scrolling}){
+    if(!this._hud)return;
+    const d=this._hud.querySelector('#hs-d2'),b=this._hud.querySelector('#hs-b2'),s=this._hud.querySelector('#hs-si');
+    if(d)d.textContent=(delta>=0?'+':'')+delta.toFixed(4);
+    if(b){const p=Math.min(Math.max(delta/0.12*50+50,0),100);b.style.width=p+'%';b.style.background=scrolling==='down'?'rgba(255,51,85,.6)':scrolling==='up'?'rgba(0,245,255,.6)':'rgba(0,245,255,.2)';}
+    if(s){s.className='hsi '+(scrolling==='up'?'up':scrolling==='down'?'down':'');s.textContent=scrolling==='up'?'▲':scrolling==='down'?'▼':'●';}
+  }
+  _updateHUDCalState(active){const b=this._hud?.querySelector('#hs-cb2');if(b)b.textContent=active?'● Sampling…':'⚙ Calibrate';}
+  _makeDraggable(el,handle){
+    let ox=0,oy=0,mx=0,my=0;
+    handle.onmousedown=e=>{e.preventDefault();ox=e.clientX;oy=e.clientY;document.onmousemove=e2=>{mx=ox-e2.clientX;my=oy-e2.clientY;ox=e2.clientX;oy=e2.clientY;el.style.left=(el.offsetLeft-mx)+'px';el.style.top=(el.offsetTop-my)+'px';el.style.bottom='auto';};document.onmouseup=()=>{document.onmousemove=null;document.onmouseup=null;};};
+  }
+}
+return HeadScroll;
+}));
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!--  PAGE LOGIC                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<script>
+// ── Tabs ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const key = tab.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === key));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.dataset.tab === key));
+  });
+});
+
+// ── Copy (renamed to avoid any conflict) ──
+function copyCode(btn) {
+  const code = btn.nextElementSibling.textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'COPIED!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  }).catch(() => {
+    btn.textContent = 'ERR';
+    setTimeout(() => btn.textContent = 'COPY', 1500);
+  });
+}
+
+// ── Integrated Demo ──
+let hs = null;
+let flashTimer = null;
+let lastDir = 'none';
+
+const sdot      = document.getElementById('sdot');
+const smsg      = document.getElementById('smsg');
+const needle    = document.getElementById('tilt-needle');
+const tzUp      = document.getElementById('tz-up');
+const tzDn      = document.getElementById('tz-dn');
+const tiltVal   = document.getElementById('tilt-val');
+const scrollArea= document.getElementById('demo-scroll-area');
+const scrollFill= document.getElementById('scroll-fill');
+const scrollPct = document.getElementById('scroll-pct');
+const dirBadge  = document.getElementById('dir-badge');
+const camCanvas = document.getElementById('demo-canvas');
+const camCtx    = camCanvas.getContext('2d');
+const placeholder = document.getElementById('cam-placeholder-wrap');
+
+function setStatus(type, msg) {
+  sdot.className = 'sdot ' + type;
+  smsg.textContent = msg;
+}
+
+function updateTilt(delta) {
+  // Needle position: center = 50%, clamp ±0.12 to 0–100%
+  const pct = Math.min(Math.max(delta / 0.12 * 50 + 50, 2), 98);
+  needle.style.top = pct + '%';
+  tiltVal.textContent = (delta >= 0 ? '+' : '') + delta.toFixed(4);
+
+  const threshold = 0.04;
+  tzUp.className = 'tz up' + (delta < -threshold ? ' tz-active-up' : '');
+  tzDn.className = 'tz dn' + (delta >  threshold ? ' tz-active-down' : '');
+}
+
+function updateProgress() {
+  const max = scrollArea.scrollHeight - scrollArea.clientHeight;
+  if (max > 0) {
+    const pct = Math.round(scrollArea.scrollTop / max * 100);
+    scrollFill.style.width = pct + '%';
+    scrollPct.textContent = pct + '%';
+  }
+}
+
+function showDirFlash(dir, char) {
+  if (lastDir === dir) return;
+  lastDir = dir;
+  clearTimeout(flashTimer);
+  dirBadge.textContent = char;
+  dirBadge.className = 'show ' + (dir === 'up' ? 'up' : 'dn');
+  flashTimer = setTimeout(() => {
+    dirBadge.className = '';
+  }, 500);
+}
+
+// Draw camera frame + nose dot into the embedded canvas
+function drawFrame(image, lm) {
+  if (!image) return;
+  camCanvas.width  = camCanvas.offsetWidth  || 240;
+  camCanvas.height = camCanvas.offsetHeight || 180;
+  camCtx.save();
+  camCtx.scale(-1, 1);
+  camCtx.drawImage(image, -camCanvas.width, 0, camCanvas.width, camCanvas.height);
+  camCtx.restore();
+
+  if (lm) {
+    // Mirror X for display
+    const x = (1 - lm[4].x) * camCanvas.width;
+    const y = lm[4].y * camCanvas.height;
+    camCtx.beginPath();
+    camCtx.arc(x, y, 4, 0, Math.PI * 2);
+    camCtx.fillStyle = 'rgba(57,255,20,0.9)';
+    camCtx.fill();
+    camCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+    camCtx.lineWidth = 1;
+    camCtx.stroke();
+    // crosshair
+    camCtx.strokeStyle = 'rgba(57,255,20,0.4)';
+    camCtx.lineWidth = 0.5;
+    camCtx.beginPath(); camCtx.moveTo(x-10,y); camCtx.lineTo(x+10,y); camCtx.stroke();
+    camCtx.beginPath(); camCtx.moveTo(x,y-10); camCtx.lineTo(x,y+10); camCtx.stroke();
+  }
+}
+
+document.getElementById('btn-start').addEventListener('click', async () => {
+  document.getElementById('btn-start').disabled = true;
+
+  // Build a custom HeadScroll that also draws into our embedded canvas
+  hs = new HeadScroll({
+    target: scrollArea,
+    threshold: 0.04,
+    maxSpeed: 14,
+    showHUD: false,  // no floating HUD — we have the integrated one
+    autoCalibrate: true,
+
+    onStatus: (type, msg) => setStatus(type, msg),
+
+    onCalibrated: () => {
+      placeholder.style.display = 'none';
       document.getElementById('btn-cal').disabled  = false;
       document.getElementById('btn-stop').disabled = false;
-    } catch(e) {
-      document.getElementById('btn-start').disabled = false;
-      dot.className = 'error';
-      msg.textContent = e.message;
-    }
+    },
+
+    onFrame: ({ delta, scrolling, noseY }) => {
+      placeholder.style.display = 'none';
+      updateTilt(delta);
+      updateProgress();
+      if (scrolling === 'down') showDirFlash('down', '▼');
+      else if (scrolling === 'up') showDirFlash('up', '▲');
+      else lastDir = 'none';
+    },
+  });
+
+  // Monkey-patch _onResults to also draw our canvas
+  const origOnResults = hs._onResults.bind(hs);
+  hs._onResults = function(results) {
+    drawFrame(results.image, results.multiFaceLandmarks?.[0]);
+    origOnResults(results);
   };
 
-  document.getElementById('btn-cal').onclick = () => hs?.calibrate();
-  document.getElementById('btn-stop').onclick = () => {
-    hs?.stop(); hs = null;
+  try {
+    await hs.start();
+    setStatus('loading', 'Loading MediaPipe…');
+  } catch(e) {
     document.getElementById('btn-start').disabled = false;
-    document.getElementById('btn-cal').disabled   = true;
-    document.getElementById('btn-stop').disabled  = true;
-    dot.className = '';
-    msg.textContent = 'Stopped';
-  };
+    setStatus('error', e.message);
+  }
+});
+
+document.getElementById('btn-cal').addEventListener('click', () => {
+  if (hs) hs.calibrate();
+});
+
+document.getElementById('btn-stop').addEventListener('click', () => {
+  if (hs) { hs.stop(); hs = null; }
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-cal').disabled   = true;
+  document.getElementById('btn-stop').disabled  = true;
+  placeholder.style.display = 'flex';
+  setStatus('', 'Stopped');
+  needle.style.top = '50%';
+  tiltVal.textContent = '—';
+  tzUp.className = 'tz up';
+  tzDn.className = 'tz dn';
+  lastDir = 'none';
+  // Clear canvas
+  camCtx.clearRect(0, 0, camCanvas.width, camCanvas.height);
+});
+
+// Update progress on manual scroll too
+scrollArea.addEventListener('scroll', updateProgress);
 </script>
 
 </body>
