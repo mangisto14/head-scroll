@@ -1,94 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>head-scroll — Callbacks Example</title>
-<style>
-  body { font-family: system-ui; background: #111; color: #eee;
-         display: flex; align-items: center; justify-content: center;
-         min-height: 100vh; margin: 0; }
-  .card {
-    background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px; padding: 40px 48px; text-align: center;
-    width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  }
-  .word {
-    font-size: 48px; font-weight: 700; color: #fff; margin: 24px 0;
-    min-height: 64px;
-    transition: opacity 0.15s;
-  }
-  .hint { font-size: 13px; color: #888; margin-top: 8px; }
-  .status {
-    font-size: 11px; color: #666; font-family: monospace;
-    margin-top: 20px; min-height: 16px;
-  }
-  .nav { font-size: 28px; opacity: 0.2; transition: opacity 0.1s; }
-  .nav.active { opacity: 1; }
-  #up-arrow { color: #00f5ff; }
-  #down-arrow { color: #ff3355; }
-  button {
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
-    color: #fff; padding: 10px 20px; border-radius: 6px; cursor: pointer;
-    font-size: 13px; margin-top: 20px;
-  }
-  button:hover { background: rgba(255,255,255,0.12); }
-</style>
-</head>
-<body>
+MIT License
 
-<div class="card">
-  <div id="up-arrow" class="nav">▲ Tilt Up = Prev</div>
-  <div class="word" id="word">—</div>
-  <div class="hint">Tilt head to navigate cards</div>
-  <div id="down-arrow" class="nav">▼ Tilt Down = Next</div>
-  <div class="status" id="status">Starting…</div>
-  <button onclick="hs.calibrate()">⚙ Recalibrate</button>
-</div>
+Copyright (c) 2025 YOUR_NAME
 
-<script src="../head-scroll.js"></script>
-<script>
-  const words = ['Apple', 'Bridge', 'Castle', 'Dragon', 'Eclipse',
-                 'Forest', 'Guitar', 'Harbor', 'Island', 'Jungle'];
-  let idx = 0;
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-  const wordEl   = document.getElementById('word');
-  const statusEl = document.getElementById('status');
-  const upEl     = document.getElementById('up-arrow');
-  const downEl   = document.getElementById('down-arrow');
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-  function showWord(i) {
-    idx = Math.max(0, Math.min(words.length - 1, i));
-    wordEl.textContent = words[idx];
-  }
-
-  let lastDir = 'none';
-
-  const hs = new HeadScroll({
-    showHUD: false,   // no built-in HUD, we handle it ourselves
-
-    onStatus: (type, msg) => {
-      statusEl.textContent = msg;
-    },
-
-    onCalibrated: () => {
-      statusEl.textContent = 'Ready — tilt to navigate';
-      showWord(0);
-    },
-
-    onFrame: ({ scrolling }) => {
-      upEl.classList.toggle('active', scrolling === 'up');
-      downEl.classList.toggle('active', scrolling === 'down');
-
-      // Trigger on direction change only (not every frame)
-      if (scrolling !== lastDir) {
-        if (scrolling === 'down') showWord(idx + 1);
-        if (scrolling === 'up')   showWord(idx - 1);
-        lastDir = scrolling;
-      }
-    },
-  });
-
-  hs.start();
-</script>
-</body>
-</html>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

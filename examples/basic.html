@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>head-scroll — Basic Example</title>
+<style>
+  body { font-family: system-ui; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+  .note { background: #f0f4ff; padding: 12px 16px; border-radius: 6px;
+          font-size: 13px; color: #444; margin-bottom: 24px; }
+  p { line-height: 1.8; color: #555; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+
+<h1>Basic Example</h1>
+<div class="note">
+  📷 Allow camera access when prompted.<br>
+  Tilt your head down to scroll down, up to scroll up.
+</div>
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+<p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+<p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+<p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.</p>
+<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores.</p>
+<p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque.</p>
+<p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat.</p>
+
+<script src="../head-scroll.js"></script>
+<script>
+  // Minimal setup — scrolls the whole page
+  const hs = new HeadScroll();
+  hs.start();
+</script>
+</body>
+</html>
